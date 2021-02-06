@@ -1,0 +1,15 @@
+/build/*
+/dist/*
+/swagger_confluence_pub.egg-info/*
+/venv/*
+**/.DS_Store
+**/*.pyc
+.vscode/*
+/.eggs/*
+/docs/build/*
+/test-reports/*
+/_build/*
+/_static/*
+/_templates/*
+/__pycache__/*
+/*.egg-info/
