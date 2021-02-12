@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 OPEN_API_TAGS = []
-__app_classes__ = []
+__app_controllers__ = []
 __router_params__ = [
         'response_model',
         'status_code',
@@ -67,7 +67,7 @@ class Controller():
                 self.__get_parent_routes(cls.__router__)
             
             cls.__router__ = self.router
-            cls.router = lambda _: Controller.__parse_controller_router(cls)
+            cls.router = lambda it_self: Controller.__parse_controller_router(it_self)
             return cls
 
         return wrapper
@@ -77,7 +77,7 @@ class Controller():
             A decorator function to mark a Class to be automatically loaded by the Controller
         '''
         def wrapper(cls):
-            __app_classes__.append(cls)
+            __app_controllers__.append(cls())
             return cls
 
         return wrapper
@@ -101,10 +101,9 @@ class Controller():
         '''
         routers = []
 
-        for app_class in __app_classes__:
-            controller = app_class()
+        for app_controller in __app_controllers__:
             routers.append(
-                controller.router()
+                app_controller.router()
             )
         
         return routers
