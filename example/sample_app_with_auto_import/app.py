@@ -1,4 +1,6 @@
+import unittest
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from fastapi_router_controller import Controller, ControllersTags
 
 # just import the main package to load all the controllers in
@@ -13,4 +15,17 @@ app = FastAPI(
 for router in Controller.routers():
     app.include_router(router)
 
-print(app.openapi())
+class TestRoutes(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(app)
+
+    def test_get_sample_extended_controller(self):
+        response = self.client.get("/sample_extended_controller/?id=1234")
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_sample_extended_controller_parent_api(self):
+        response = self.client.get("/sample_extended_controller/parent_api")
+        self.assertEqual(response.status_code, 200)
+
+if __name__ == "__main__":
+    unittest.main()

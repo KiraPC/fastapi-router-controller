@@ -13,18 +13,27 @@ pip install fastapi-router-controller
 In a Class module
 
 ```python
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi_router_controller import Controller
 
 router = APIRouter()
 controller = Controller(router)
 
+async def amazing_fn():
+    return 'amazing_variable'
+
 @controller.resource()
 class ExampleController():
+    # you can define in the Controller init some FastApi Dependency and them are automatically loaded in controller methods
+    def __init__(self, x: Foo = Depends(amazing_fn)):
+        self.x = x
+    
     @controller.route.get(
         '/some_aoi', 
         summary='A sample description')
-    def sample_api(_):
+    def sample_api(self):
+        print(self.x) # -> amazing_variable
+        
         return 'A sample response'
 ```
 
