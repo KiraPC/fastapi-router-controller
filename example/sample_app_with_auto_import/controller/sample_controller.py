@@ -14,6 +14,9 @@ controller = Controller(router, openapi_tag={
 class SampleObject(BaseModel):
     id: str = Field(..., description='sample id')
 
+    def to_json(self):
+        return {'id': self.id}
+
 # With the "use" decorator the lib save the Controller Class to load it automatically
 @controller.use()
 # With the "resource" decorator define the controller Class linked to the Controller router arguments 
@@ -24,7 +27,7 @@ class SampleController(SampleParentController):
         tags=['sample_extended_controller'], 
         summary='return a sample object')
     def sample_get_request(self, id: str = Query(..., title="itemId", description="The id of the sample object")):
-        return JSONResponse(status_code=status.HTTP_200_OK, content=SampleObject(id))
+        return JSONResponse(status_code=status.HTTP_200_OK, content=SampleObject(**{'id': id}).to_json())
 
     @controller.route.post(
         '/', 

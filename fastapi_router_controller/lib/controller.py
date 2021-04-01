@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+import inspect
+from fastapi import APIRouter, Depends
 
 OPEN_API_TAGS = []
 __app_controllers__ = []
@@ -32,7 +33,8 @@ class Controller():
 
         It expose some utilities and decorator functions to define a router controller class
     '''
-    router: APIRouter
+    RC_KEY = '__router__'
+    SIGNATURE_KEY = '__signature__'
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
@@ -63,7 +65,8 @@ class Controller():
             A decorator function to mark a Class as a Controller
         '''
         def wrapper(cls):
-            if hasattr(cls, '__router__'):
+            # check if cls was extended from another Controller
+            if hasattr(cls, Controller.RC_KEY):
                 self.__get_parent_routes(cls.__router__)
             
             cls.__router__ = self.router
@@ -87,12 +90,20 @@ class Controller():
         '''
             Private utility to parse the router controller property and extract the correct functions handlers
         '''
-        for route in controller.__router__.routes:
-            func = route.endpoint
-            if hasattr(func, '__get__'):
-                route.endpoint = func.__get__(controller, controller.__class__)
+        router = getattr(controller, Controller.RC_KEY)
+
+        for route in router.routes:
+            # get the signature of the endpoint function
+            signature = inspect.signature(route.endpoint)
+            # get the parameters of the endpoint function
+            signature_parameters = list(signature.parameters.values())
+
+            # replace the class instance with the itself FastApi Dependecy
+            signature_parameters[0] = signature_parameters[0].replace(default=Depends(controller.__class__))
+            new_signature = signature.replace(parameters=signature_parameters)
+            setattr(route.endpoint, Controller.SIGNATURE_KEY, new_signature)
         
-        return controller.__router__
+        return router
 
     @staticmethod
     def routers():
