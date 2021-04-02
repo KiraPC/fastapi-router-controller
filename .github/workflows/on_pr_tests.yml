@@ -18,5 +18,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
-      - name: Test
-        uses: onichandame/python-test-action@master
+      - name: Test Example App
+        run: python -m unittest discover -s example/sample_app -s example/sample_app_with_auto_import -p 'app.py'
+      - name: Test Example App with auto-import
+        run: python -m unittest discover -s example/sample_app_with_auto_import -p 'app.py'
