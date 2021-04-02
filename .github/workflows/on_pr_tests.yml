@@ -14,16 +14,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: List Dir
-        working-directory: ./
-        run: |
-          pwd && ls
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-      - name: Run Examples Apps
-        run: |
-          python3 -m unittest discover -s example/sample_app -p 'app.py'
-      - name: Run Examples Apps With autoimport
-        run: |
-          python3 -m unittest discover -s example/sample_app_with_auto_import -p 'app.py'
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Test
+        uses: onichandame/python-test-action@master
