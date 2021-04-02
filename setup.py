@@ -4,6 +4,7 @@
 
     Setup module
 '''
+import os
 import setuptools
 
 with open('README.md', 'r') as fh:
@@ -13,8 +14,7 @@ with open('requirements.txt', 'r') as fin:
     REQS = fin.read().splitlines()
 
 setuptools.setup(
-    setup_requires=['setuptools-git-version'],
-    version_format='{tag}',
+    version=os.environ.get('RELEASE_VERSION'),
     name='fastapi-router-controller',
     author='Pasquale Carmine Carbone',
     author_email='pasqualecarmine.carbone@gmail.com',

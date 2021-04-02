@@ -22,7 +22,12 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
+      - name: Get Tag Version
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Create Distribution Package
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: python setup.py sdist
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
