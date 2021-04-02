@@ -3,7 +3,7 @@
 name: CI
 
 # Controls when the action will run. 
-on: [pull_request]
+on: [push, pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -14,6 +14,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: List Dir
+        run: |
+          ls -l
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
