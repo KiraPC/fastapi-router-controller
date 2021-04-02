@@ -48,8 +48,7 @@ app = FastAPI(
     title='A sample application using fastapi_router_controller',
     version="0.1.0")
 
-example_controller = ExampleController()
-app.include_router(example_controller.router())
+app.include_router(ExampleController.router())
 ```
 
 ## For some Example use-cases visit the example folder
