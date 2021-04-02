@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: List Dir
         run: |
-          ls -l
+          pwd
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
