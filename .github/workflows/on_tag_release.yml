@@ -18,9 +18,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Run Examples Apps
-        run: |
-          echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Create Distribution Package
+        run: python setup.py sdist
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
