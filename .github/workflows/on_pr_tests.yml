@@ -3,7 +3,7 @@
 name: CI
 
 # Controls when the action will run. 
-on: [push, pull_request]
+on: [pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -15,9 +15,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: List Dir
-        working-directory: ${{ github.workspace }}
+        working-directory: ./
         run: |
-          pwd
+          pwd && ls
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
