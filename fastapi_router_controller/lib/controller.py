@@ -70,7 +70,7 @@ class Controller():
                 self.__get_parent_routes(cls.__router__)
             
             cls.__router__ = self.router
-            cls.router = lambda it_self: Controller.__parse_controller_router(it_self)
+            cls.router = lambda: Controller.__parse_controller_router(cls)
             return cls
 
         return wrapper
@@ -80,17 +80,17 @@ class Controller():
             A decorator function to mark a Class to be automatically loaded by the Controller
         '''
         def wrapper(cls):
-            __app_controllers__.append(cls())
+            __app_controllers__.append(cls)
             return cls
 
         return wrapper
 
     @staticmethod
-    def __parse_controller_router(controller):
+    def __parse_controller_router(cls):
         '''
             Private utility to parse the router controller property and extract the correct functions handlers
         '''
-        router = getattr(controller, Controller.RC_KEY)
+        router = getattr(cls, Controller.RC_KEY)
 
         for route in router.routes:
             # get the signature of the endpoint function
@@ -99,7 +99,7 @@ class Controller():
             signature_parameters = list(signature.parameters.values())
 
             # replace the class instance with the itself FastApi Dependecy
-            signature_parameters[0] = signature_parameters[0].replace(default=Depends(controller.__class__))
+            signature_parameters[0] = signature_parameters[0].replace(default=Depends(cls))
             new_signature = signature.replace(parameters=signature_parameters)
             setattr(route.endpoint, Controller.SIGNATURE_KEY, new_signature)
         

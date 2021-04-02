@@ -10,11 +10,8 @@ app = FastAPI(
     version="0.1.0",
     openapi_tags=ControllersTags)
 
-sample_controller = SampleController()
-another_sample_controller = AnotherSampleController()
-
-app.include_router(sample_controller.router())
-app.include_router(another_sample_controller.router())
+app.include_router(SampleController.router())
+app.include_router(AnotherSampleController.router())
 
 class TestRoutes(unittest.TestCase):
     def setUp(self):
