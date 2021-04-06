@@ -34,5 +34,5 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=REQS,
-    extras_require={"tests": ["pytest", "pytest-cov"]},
+    extras_require={"tests": ["pytest", "pytest-cov", "requests"]},
 )
