@@ -22,6 +22,13 @@ def get_x():
     return Foo()
 
 
+def get_y():
+    try:
+        yield "get_y_dep"
+    finally:
+        print("get_y done")
+
+
 class Filter(BaseModel):
     foo: str
 
@@ -46,14 +53,12 @@ class SampleController:
         return SampleObject(id=id)
 
     @controller.route.post(
-        "/hello",
-        response_model=SampleObject,
+        "/hello", response_model=SampleObject,
     )
-    def hello(
-        self,
-        f: Filter,
-    ):
+    def hello(self, f: Filter, y=Depends(get_y)):
         _id = f.foo
+        _id += y
+        _id += self.x.create()
         return SampleObject(id=_id)
 
 
@@ -81,4 +86,4 @@ class TestRoutes(unittest.TestCase):
     def test_hello(self):
         response = self.client.post("/hello", json={"foo": "WOW"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"id": "WOW"})
+        self.assertEqual(response.json(), {"id": "WOWget_y_depXXX"})
