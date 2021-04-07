@@ -100,7 +100,12 @@ class Controller():
 
             # replace the class instance with the itself FastApi Dependecy
             signature_parameters[0] = signature_parameters[0].replace(default=Depends(cls))
-            new_signature = signature.replace(parameters=signature_parameters)
+            # set self and after it the keyword args
+            new_parameters = [signature_parameters[0]] + [
+                parameter.replace(kind=inspect.Parameter.KEYWORD_ONLY)
+                for parameter in signature_parameters[1:]
+            ]
+            new_signature = signature.replace(parameters=new_parameters)
             setattr(route.endpoint, Controller.SIGNATURE_KEY, new_signature)
         
         return router

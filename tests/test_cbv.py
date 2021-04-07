@@ -22,6 +22,10 @@ def get_x():
     return Foo()
 
 
+class Filter(BaseModel):
+    foo: str
+
+
 # With the "resource" decorator define the controller Class linked to the Controller router arguments
 @controller.resource()
 class SampleController:
@@ -34,12 +38,23 @@ class SampleController:
         summary="return a sample object",
         response_model=SampleObject,
     )
-    def sample_get_request(
+    def root(
         self,
         id: str = Query(..., title="itemId", description="The id of the sample object"),
     ):
         id += self.x.create()
         return SampleObject(id=id)
+
+    @controller.route.post(
+        "/hello",
+        response_model=SampleObject,
+    )
+    def hello(
+        self,
+        f: Filter,
+    ):
+        _id = f.foo
+        return SampleObject(id=_id)
 
 
 def create_app():
@@ -62,3 +77,8 @@ class TestRoutes(unittest.TestCase):
         response = self.client.get("/?id=12")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "12XXX"})
+
+    def test_hello(self):
+        response = self.client.post("/hello", json={"foo": "WOW"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"id": "WOW"})
