@@ -4,7 +4,6 @@
 
     Setup module
 '''
-import os
 import setuptools
 
 with open('README.md', 'r') as fh:
@@ -13,8 +12,10 @@ with open('README.md', 'r') as fh:
 with open('requirements.txt', 'r') as fin:
     REQS = fin.read().splitlines()
 
+VERSION = "0.2.5"
+
 setuptools.setup(
-    version=os.environ.get('RELEASE_VERSION'),
+    version=VERSION,
     name='fastapi-router-controller',
     author='Pasquale Carmine Carbone',
     author_email='pasqualecarmine.carbone@gmail.com',
@@ -33,5 +34,6 @@ setuptools.setup(
         'Typing :: Typed',
     ],
     python_requires='>=3.6',
-    install_requires=REQS
+    install_requires=REQS,
+    extras_require={"tests": ["pytest", "pytest-cov", "requests"]},
 )
