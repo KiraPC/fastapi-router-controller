@@ -1,4 +1,4 @@
-name: fastapi-router-controller
+name: Run Tests
 
 on: [push, pull_request]
 
