@@ -35,6 +35,7 @@ class Controller():
     '''
     RC_KEY = '__router__'
     SIGNATURE_KEY = '__signature__'
+    VISITED = {}
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
@@ -52,12 +53,15 @@ class Controller():
             Private utility to get routes from an extended class
         '''
         for route in router.routes:
+            if route.path in self.VISITED:
+                continue
             options = {key: getattr(route, key) for key in __router_params__}
 
             # inherits child tags if presents
             if len(options['tags']) == 0 and self.openapi_tag:
                 options['tags'].append(self.openapi_tag['name'])
 
+            self.VISITED[route.path] = route
             self.router.add_api_route(route.path, route.endpoint, **options)
 
     def resource(self):
