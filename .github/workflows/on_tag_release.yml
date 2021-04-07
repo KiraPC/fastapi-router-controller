@@ -28,7 +28,7 @@ jobs:
       - name: Create Distribution Package
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: sed -i -r s"/VERSION = \"(.*)\"/VERSION = \"$RELEASE_VERSION\"/"g setup.py && python setup.py sdist
+        run: sed -i -e "s/__VERSION__/$RELEASE_VERSION/g" setup.py && python setup.py sdist
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
