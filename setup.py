@@ -1,6 +1,5 @@
-# pylint: disable=line-too-long
 '''
-    :author: Pasquale Carmone Carbone
+    :author: Pasquale Carmine Carbone
 
     Setup module
 '''
@@ -12,10 +11,10 @@ with open('README.md', 'r') as fh:
 with open('requirements.txt', 'r') as fin:
     REQS = fin.read().splitlines()
 
-VERSION = "0.2.5"
+__VERSION__ = '0.2.5'
 
 setuptools.setup(
-    version=VERSION,
+    version=__VERSION__,
     name='fastapi-router-controller',
     author='Pasquale Carmine Carbone',
     author_email='pasqualecarmine.carbone@gmail.com',
