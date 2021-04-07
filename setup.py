@@ -11,10 +11,10 @@ with open('README.md', 'r') as fh:
 with open('requirements.txt', 'r') as fin:
     REQS = fin.read().splitlines()
 
-__VERSION__ = '0.2.5'
+VERSION = '123'
 
 setuptools.setup(
-    version=__VERSION__,
+    version=VERSION,
     name='fastapi-router-controller',
     author='Pasquale Carmine Carbone',
     author_email='pasqualecarmine.carbone@gmail.com',
