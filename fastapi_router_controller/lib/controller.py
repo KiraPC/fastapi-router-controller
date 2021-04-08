@@ -1,4 +1,5 @@
 import inspect
+from copy import deepcopy
 from fastapi import APIRouter, Depends
 
 OPEN_API_TAGS = []
@@ -69,7 +70,7 @@ class Controller():
             if hasattr(cls, Controller.RC_KEY):
                 self.__get_parent_routes(cls.__router__)
             
-            cls.__router__ = self.router
+            cls.__router__ = deepcopy(self.router)
             cls.router = lambda: Controller.__parse_controller_router(cls)
             return cls
 
