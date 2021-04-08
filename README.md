@@ -1,6 +1,6 @@
 # What this repository contains
 
-[![Build](https://github.com/delijati/fastapi-router-controller/workflows/fastapi-router-controller/badge.svg)](https://github.com/KiraPC/fastapi-router-controller)
+[![Build](https://github.com/KiraPC/fastapi-router-controller/workflows/fastapi-router-controller/badge.svg)](https://github.com/KiraPC/fastapi-router-controller)
 [![PyPI version fury.io](https://badge.fury.io/py/fastapi-router-controller.svg)](https://pypi.python.org/pypi/fastapi-router-controller)
 
 #### A FastAPI utility to allow Controller Class usage
