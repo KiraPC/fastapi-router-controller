@@ -52,6 +52,17 @@ class Controller(Base):
         id += self.x.create() + self.bla
         return Object(id=id)
 
+@parent_controller.resource()
+class Controller2(Base):
+    def __init__(self):
+        self.bla = 'ma'
+
+    @parent_controller.route.get(
+        "/step2", tags=["step2"], response_model=Object,
+    )
+    def hambu(self):
+        return Object(id="step2-%s" % self.bla)
+
 def create_app():
     app = FastAPI(
         title="A application using fastapi_router_controller",
@@ -60,6 +71,7 @@ def create_app():
     )
 
     app.include_router(Controller.router())
+    app.include_router(Controller2.router())
     return app
 
 class TestRoutes(unittest.TestCase):
@@ -72,7 +84,12 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "12XXXfoo"})
 
-    def test_hambu(self):
+    def test_child1(self):
         response = self.client.get("/hambu")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "hambu-foo"})
+
+    def test_step2(self):
+        response = self.client.get("/step2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"id": "step2-ma"})

@@ -1,5 +1,4 @@
 import inspect
-from copy import deepcopy
 from fastapi import APIRouter, Depends
 
 OPEN_API_TAGS = []
@@ -36,6 +35,7 @@ class Controller():
     '''
     RC_KEY = '__router__'
     SIGNATURE_KEY = '__signature__'
+    VISITED = {}
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
@@ -53,28 +53,30 @@ class Controller():
             Private utility to get routes from an extended class
         '''
         for route in router.routes:
+            if route.path in self.VISITED:
+                continue
             options = {key: getattr(route, key) for key in __router_params__}
 
             # inherits child tags if presents
             if len(options['tags']) == 0 and self.openapi_tag:
                 options['tags'].append(self.openapi_tag['name'])
 
+            self.VISITED[route.path] = route
             self.router.add_api_route(route.path, route.endpoint, **options)
+
+    def add_resource(self, cls):
+        # check if cls was extended from another Controller
+        if hasattr(cls, Controller.RC_KEY):
+            self.__get_parent_routes(cls.__router__)
+        cls.__router__ = self.router
+        cls.router = lambda: Controller.__parse_controller_router(cls)
+        return cls
 
     def resource(self):
         '''
             A decorator function to mark a Class as a Controller
         '''
-        def wrapper(cls):
-            # check if cls was extended from another Controller
-            if hasattr(cls, Controller.RC_KEY):
-                self.__get_parent_routes(cls.__router__)
-            
-            cls.__router__ = deepcopy(self.router)
-            cls.router = lambda: Controller.__parse_controller_router(cls)
-            return cls
-
-        return wrapper
+        return self.add_resource
 
     def use(_):
         '''
