@@ -1,6 +1,7 @@
 import inspect
+from copy import deepcopy
 from fastapi import APIRouter, Depends
-from fastapi_router_controller.lib.exceptions import MultipleRouterException
+from fastapi_router_controller.lib.exceptions import MultipleResourceException, MultipleRouterException
 
 OPEN_API_TAGS = []
 __app_controllers__ = []
@@ -37,6 +38,7 @@ class Controller():
     RC_KEY = '__router__'
     SIGNATURE_KEY = '__signature__'
     HAS_CONTROLLER_KEY = '__has_controller__'
+    RESOURCE_CLASS_KEY = '__resource_cls__'
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
@@ -45,10 +47,11 @@ class Controller():
         '''
         # Each Controller must be linked to one fastapi router
         if hasattr(router, Controller.HAS_CONTROLLER_KEY):
-            raise MultipleRouterException
+            raise MultipleRouterException()
 
-        self.router = router
+        self.router = deepcopy(router)
         self.openapi_tag = openapi_tag
+        self.cls = None
 
         if openapi_tag:
             OPEN_API_TAGS.append(openapi_tag)
@@ -68,20 +71,29 @@ class Controller():
 
             self.router.add_api_route(route.path, route.endpoint, **options)
 
+    def add_resource(self, cls):
+        '''
+            Mark a class as Controller Resource
+        '''
+        # check if the same controller was already used for another cls (Resource)
+        if hasattr(self, Controller.RESOURCE_CLASS_KEY) and getattr(self, Controller.RESOURCE_CLASS_KEY) != cls:
+            raise MultipleResourceException()
+
+        # check if cls (Resource) was exteded from another 
+        if hasattr(cls, Controller.RC_KEY):
+            self.__get_parent_routes(cls.__router__)
+
+        setattr(cls, Controller.RC_KEY, self.router)
+        setattr(self, Controller.RESOURCE_CLASS_KEY, cls)
+        cls.router = lambda: Controller.__parse_controller_router(cls)
+
+        return cls
+
     def resource(self):
         '''
-            A decorator function to mark a Class as a Controller
+            A decorator function to mark a Class as a Controller Resource
         '''
-        def wrapper(cls):
-            # check if cls was extended from another Controller
-            if hasattr(cls, Controller.RC_KEY):
-                self.__get_parent_routes(cls.__router__)
-            
-            cls.__router__ = self.router
-            cls.router = lambda: Controller.__parse_controller_router(cls)
-            return cls
-
-        return wrapper
+        return self.add_resource
 
     def use(_):
         '''
