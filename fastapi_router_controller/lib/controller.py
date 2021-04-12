@@ -1,7 +1,6 @@
 import inspect
 from copy import deepcopy
 from fastapi import APIRouter, Depends
-from fastapi.dependencies.utils import get_parameterless_sub_dependant
 
 OPEN_API_TAGS = []
 __app_controllers__ = []
@@ -111,10 +110,7 @@ class Controller:
             # add class dependencies
             if dependencies:
                 for depends in dependencies[::-1]:
-                    route.dependant.dependencies.insert(
-                        0, get_parameterless_sub_dependant(
-                            depends=depends, path=route.path_format)
-                        )
+                    route.dependencies.insert(0, depends)
 
             # replace the class instance with the itself FastApi Dependecy
             signature_parameters[0] = signature_parameters[0].replace(
