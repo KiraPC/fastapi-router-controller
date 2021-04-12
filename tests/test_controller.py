@@ -102,7 +102,7 @@ def create_app_imperative():
     router = APIRouter()
     controller = Controller(router, openapi_tag={"name": "sample_controller"})
 
-    SampleController = controller.add_resource(SampleController)
+    controller.add_resource(SampleController)
     controller.route.add_api_route(
         "/",
         SampleController.root,
