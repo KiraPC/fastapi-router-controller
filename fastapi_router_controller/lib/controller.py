@@ -1,6 +1,6 @@
 import inspect
-from copy import deepcopy
 from fastapi import APIRouter, Depends
+from fastapi_router_controller.lib.exceptions import MultipleRouterException
 
 OPEN_API_TAGS = []
 __app_controllers__ = []
@@ -36,17 +36,24 @@ class Controller():
     '''
     RC_KEY = '__router__'
     SIGNATURE_KEY = '__signature__'
+    HAS_CONTROLLER_KEY = '__has_controller__'
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
             :param router:          The FastApi router to link to the Class
             :param openapi_tag:     An openapi object that will describe your routes in the openapi tamplate 
         '''
+        # Each Controller must be linked to one fastapi router
+        if hasattr(router, Controller.HAS_CONTROLLER_KEY):
+            raise MultipleRouterException
+
         self.router = router
         self.openapi_tag = openapi_tag
 
         if openapi_tag:
             OPEN_API_TAGS.append(openapi_tag)
+
+        setattr(router, Controller.HAS_CONTROLLER_KEY, True)
     
     def __get_parent_routes(self, router: APIRouter):
         '''
@@ -70,7 +77,7 @@ class Controller():
             if hasattr(cls, Controller.RC_KEY):
                 self.__get_parent_routes(cls.__router__)
             
-            cls.__router__ = deepcopy(self.router)
+            cls.__router__ = self.router
             cls.router = lambda: Controller.__parse_controller_router(cls)
             return cls
 
@@ -106,6 +113,7 @@ class Controller():
                 parameter.replace(kind=inspect.Parameter.KEYWORD_ONLY)
                 for parameter in signature_parameters[1:]
             ]
+
             new_signature = signature.replace(parameters=new_parameters)
             setattr(route.endpoint, Controller.SIGNATURE_KEY, new_signature)
         

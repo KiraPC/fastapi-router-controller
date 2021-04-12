@@ -9,6 +9,10 @@ controller = Controller(router, openapi_tag={
     'name': 'sample_controller',
 })
 
+new_controller = Controller(router, openapi_tag={
+    'name': 'sample_controller',
+})
+
 class SampleObject(BaseModel):
     id: str = Field(..., description='sample id')
 
