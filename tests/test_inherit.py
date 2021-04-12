@@ -11,6 +11,7 @@ child_router = APIRouter()
 parent_controller = Controller(parent_router, openapi_tag={"name": "parent"})
 child_controller = Controller(child_router, openapi_tag={"name": "child"})
 
+
 class Object(BaseModel):
     id: str
 
@@ -22,19 +23,22 @@ def get_x():
 
     return Foo()
 
+
 class Filter(BaseModel):
     foo: str
+
 
 @parent_controller.resource()
 class Base:
     def __init__(self):
-        self.bla = 'foo'
+        self.bla = "foo"
 
     @parent_controller.route.get(
         "/hambu", tags=["parent"], response_model=Object,
     )
     def hambu(self):
         return Object(id="hambu-%s" % self.bla)
+
 
 # With the 'resource' decorator define the controller Class linked to the Controller router arguments
 @child_controller.resource()
@@ -52,16 +56,6 @@ class Controller(Base):
         id += self.x.create() + self.bla
         return Object(id=id)
 
-@parent_controller.resource()
-class Controller2(Base):
-    def __init__(self):
-        self.bla = 'ma'
-
-    @parent_controller.route.get(
-        "/step2", tags=["step2"], response_model=Object,
-    )
-    def hambu(self):
-        return Object(id="step2-%s" % self.bla)
 
 def create_app():
     app = FastAPI(
@@ -71,8 +65,8 @@ def create_app():
     )
 
     app.include_router(Controller.router())
-    app.include_router(Controller2.router())
     return app
+
 
 class TestRoutes(unittest.TestCase):
     def setUp(self):
@@ -89,7 +83,13 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "hambu-foo"})
 
-    def test_step2(self):
-        response = self.client.get("/step2")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"id": "step2-ma"})
+
+class TestInvalid(unittest.TestCase):
+    def test_invalid(self):
+        with self.assertRaises(Exception) as ex:
+
+            @parent_controller.resource()
+            class Controller2(Base):
+                ...
+
+        self.assertEqual(str(ex.exception), "Every controller needs its own router!")

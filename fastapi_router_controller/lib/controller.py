@@ -1,4 +1,5 @@
 import inspect
+import copy
 from fastapi import APIRouter, Depends
 
 OPEN_API_TAGS = []
@@ -35,15 +36,15 @@ class Controller():
     '''
     RC_KEY = '__router__'
     SIGNATURE_KEY = '__signature__'
-    VISITED = {}
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         '''
             :param router:          The FastApi router to link to the Class
             :param openapi_tag:     An openapi object that will describe your routes in the openapi tamplate 
         '''
-        self.router = router
+        self.router = copy.deepcopy(router)
         self.openapi_tag = openapi_tag
+        self.cls = None
 
         if openapi_tag:
             OPEN_API_TAGS.append(openapi_tag)
@@ -53,18 +54,18 @@ class Controller():
             Private utility to get routes from an extended class
         '''
         for route in router.routes:
-            if route.path in self.VISITED:
-                continue
             options = {key: getattr(route, key) for key in __router_params__}
 
             # inherits child tags if presents
             if len(options['tags']) == 0 and self.openapi_tag:
                 options['tags'].append(self.openapi_tag['name'])
 
-            self.VISITED[route.path] = route
             self.router.add_api_route(route.path, route.endpoint, **options)
 
     def add_resource(self, cls):
+        if self.cls and cls != self.cls:
+            raise Exception("Every controller needs its own router!")
+        self.cls = cls
         # check if cls was extended from another Controller
         if hasattr(cls, Controller.RC_KEY):
             self.__get_parent_routes(cls.__router__)
