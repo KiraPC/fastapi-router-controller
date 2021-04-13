@@ -101,7 +101,7 @@ class Controller:
 
         dependencies = None
         if hasattr(cls, "dependencies"):
-            dependencies = deepcopy(cls.dependencies)
+            dependencies = copy.deepcopy(cls.dependencies)
             delattr(cls, "dependencies")
 
         for route in router.routes:
