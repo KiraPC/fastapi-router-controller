@@ -11,6 +11,7 @@ child_router = APIRouter()
 parent_controller = Controller(parent_router, openapi_tag={"name": "parent"})
 child_controller = Controller(child_router, openapi_tag={"name": "child"})
 
+
 class Object(BaseModel):
     id: str
 
@@ -22,19 +23,22 @@ def get_x():
 
     return Foo()
 
+
 class Filter(BaseModel):
     foo: str
+
 
 @parent_controller.resource()
 class Base:
     def __init__(self):
-        self.bla = 'foo'
+        self.bla = "foo"
 
     @parent_controller.route.get(
         "/hambu", tags=["parent"], response_model=Object,
     )
     def hambu(self):
         return Object(id="hambu-%s" % self.bla)
+
 
 # With the 'resource' decorator define the controller Class linked to the Controller router arguments
 @child_controller.resource()
@@ -52,6 +56,7 @@ class Controller(Base):
         id += self.x.create() + self.bla
         return Object(id=id)
 
+
 def create_app():
     app = FastAPI(
         title="A application using fastapi_router_controller",
@@ -61,6 +66,7 @@ def create_app():
 
     app.include_router(Controller.router())
     return app
+
 
 class TestRoutes(unittest.TestCase):
     def setUp(self):
@@ -72,7 +78,18 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "12XXXfoo"})
 
-    def test_hambu(self):
+    def test_child1(self):
         response = self.client.get("/hambu")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"id": "hambu-foo"})
+
+
+class TestInvalid(unittest.TestCase):
+    def test_invalid(self):
+        with self.assertRaises(Exception) as ex:
+
+            @parent_controller.resource()
+            class Controller2(Base):
+                ...
+
+        self.assertEqual(str(ex.exception), "Every controller needs its own router!")

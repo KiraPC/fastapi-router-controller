@@ -1,5 +1,5 @@
 import inspect
-from copy import deepcopy
+import copy
 from fastapi import APIRouter, Depends
 
 OPEN_API_TAGS = []
@@ -44,8 +44,9 @@ class Controller:
             :param router:          The FastApi router to link to the Class
             :param openapi_tag:     An openapi object that will describe your routes in the openapi tamplate 
         """
-        self.router = router
+        self.router = copy.deepcopy(router)
         self.openapi_tag = openapi_tag
+        self.cls = None
 
         if openapi_tag:
             OPEN_API_TAGS.append(openapi_tag)
@@ -63,21 +64,22 @@ class Controller:
 
             self.router.add_api_route(route.path, route.endpoint, **options)
 
+    def add_resource(self, cls):
+        if self.cls and cls != self.cls:
+            raise Exception("Every controller needs its own router!")
+        self.cls = cls
+        # check if cls was extended from another Controller
+        if hasattr(cls, Controller.RC_KEY):
+            self.__get_parent_routes(cls.__router__)
+        cls.__router__ = self.router
+        cls.router = lambda: Controller.__parse_controller_router(cls)
+        return cls
+
     def resource(self):
         """
             A decorator function to mark a Class as a Controller
         """
-
-        def wrapper(cls):
-            # check if cls was extended from another Controller
-            if hasattr(cls, Controller.RC_KEY):
-                self.__get_parent_routes(cls.__router__)
-
-            cls.__router__ = deepcopy(self.router)
-            cls.router = lambda: Controller.__parse_controller_router(cls)
-            return cls
-
-        return wrapper
+        return self.add_resource
 
     def use(_):
         """
