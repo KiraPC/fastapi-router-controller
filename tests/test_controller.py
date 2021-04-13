@@ -87,22 +87,19 @@ def create_app_imperative():
             id += self.x.create()
             return SampleObject(id=id)
 
-        def hello(self, f: Filter, y=Depends(get_y)):
+        def hello(self, 
+            f: Filter, y=Depends(get_y)
+        ):
             _id = f.foo
             _id += y
             _id += self.x.create()
             return SampleObject(id=_id)
 
-    app = FastAPI(
-        title="A sample application using fastapi_router_controller",
-        version="0.1.0",
-        openapi_tags=ControllersTags,
-    )
-
     router = APIRouter()
     controller = Controller(router, openapi_tag={"name": "sample_controller"})
 
     controller.add_resource(SampleController)
+
     controller.route.add_api_route(
         "/",
         SampleController.root,
@@ -111,9 +108,20 @@ def create_app_imperative():
         response_model=SampleObject,
         methods=["GET"],
     )
+
     controller.route.add_api_route(
-        "/hello", SampleController.hello, response_model=SampleObject, methods=["POST"]
+        "/hello", 
+        SampleController.hello, 
+        response_model=SampleObject, 
+        methods=["POST"]
     )
+
+    app = FastAPI(
+        title="A sample application using fastapi_router_controller",
+        version="0.1.0",
+        openapi_tags=ControllersTags,
+    )
+
     app.include_router(SampleController.router())
     return app
 

@@ -92,4 +92,4 @@ class TestInvalid(unittest.TestCase):
             class Controller2(Base):
                 ...
 
-        self.assertEqual(str(ex.exception), "Every controller needs its own router!")
+        self.assertEqual(str(ex.exception), "Controller already used by another Resource")
