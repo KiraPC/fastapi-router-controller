@@ -17,4 +17,4 @@ jobs:
       - name: flake8 install
         run: pip3 install flake8
       - name: lint
-        run: flake8 fastapi-router-controller/
+        run: flake8 fastapi_router_controller/
