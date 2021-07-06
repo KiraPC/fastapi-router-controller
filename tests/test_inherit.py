@@ -34,13 +34,16 @@ class Base:
         self.bla = "foo"
 
     @parent_controller.route.get(
-        "/hambu", tags=["parent"], response_model=Object,
+        "/hambu",
+        tags=["parent"],
+        response_model=Object,
     )
     def hambu(self):
         return Object(id="hambu-%s" % self.bla)
 
 
-# With the 'resource' decorator define the controller Class linked to the Controller router arguments
+# With the 'resource' decorator define the controller
+# Class linked to the Controller router arguments
 @child_controller.resource()
 class Controller(Base):
     def __init__(self, x=Depends(get_x)):
@@ -48,10 +51,14 @@ class Controller(Base):
         self.x = x
 
     @child_controller.route.get(
-        "/", tags=["child"], summary="return a  object", response_model=Object,
+        "/",
+        tags=["child"],
+        summary="return a  object",
+        response_model=Object,
     )
     def root(
-        self, id: str = Query(..., title="itemId", description="The id of the  object"),
+        self,
+        id: str = Query(..., title="itemId", description="The id of the  object"),
     ):
         id += self.x.create() + self.bla
         return Object(id=id)
@@ -92,4 +99,6 @@ class TestInvalid(unittest.TestCase):
             class Controller2(Base):
                 ...
 
-        self.assertEqual(str(ex.exception), "Controller already used by another Resource")
+        self.assertEqual(
+            str(ex.exception), "Controller already used by another Resource"
+        )

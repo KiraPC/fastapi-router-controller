@@ -40,16 +40,16 @@ class TestRoutes(unittest.TestCase):
         self.client = TestClient(app)
 
     def test_class_dep(self):
-        response = self.client.get('/users/1')
+        response = self.client.get("/users/1")
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'No User'})
+        self.assertEqual(response.json(), {"detail": "No User"})
 
     def test_func_dep(self):
-        response = self.client.get('/users/6')
+        response = self.client.get("/users/6")
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Not exact user'})
+        self.assertEqual(response.json(), {"detail": "Not exact user"})
 
     def test_pass(self):
-        response = self.client.get('/users/7')
+        response = self.client.get("/users/7")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'user_id': 7})
+        self.assertEqual(response.json(), {"user_id": 7})
