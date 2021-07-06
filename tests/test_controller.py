@@ -33,7 +33,8 @@ def create_app_declerative():
     router = APIRouter()
     controller = Controller(router, openapi_tag={"name": "sample_controller"})
 
-    # With the 'resource' decorator define the controller Class linked to the Controller router arguments
+    # With the 'resource' decorator define the controller Class
+    # linked to the Controller router arguments
     @controller.resource()
     class SampleController:
         def __init__(self, x=Depends(get_x)):
@@ -55,7 +56,8 @@ def create_app_declerative():
             return SampleObject(id=id)
 
         @controller.route.post(
-            "/hello", response_model=SampleObject,
+            "/hello",
+            response_model=SampleObject,
         )
         def hello(self, f: Filter, y=Depends(get_y)):
             _id = f.foo
@@ -87,9 +89,7 @@ def create_app_imperative():
             id += self.x.create()
             return SampleObject(id=id)
 
-        def hello(self, 
-            f: Filter, y=Depends(get_y)
-        ):
+        def hello(self, f: Filter, y=Depends(get_y)):
             _id = f.foo
             _id += y
             _id += self.x.create()
@@ -110,10 +110,7 @@ def create_app_imperative():
     )
 
     controller.route.add_api_route(
-        "/hello", 
-        SampleController.hello, 
-        response_model=SampleObject, 
-        methods=["POST"]
+        "/hello", SampleController.hello, response_model=SampleObject, methods=["POST"]
     )
 
     app = FastAPI(

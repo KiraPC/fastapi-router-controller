@@ -61,7 +61,7 @@ class ExampleController:
         self.x = x
 
     @controller.route.get(
-        "/some_aoi", summary="A sample description", response_model=Foo
+        "/some_api", summary="A sample description", response_model=Foo
     )
     def sample_api(self):
         print(self.x.bar)  # -> amazing_variable

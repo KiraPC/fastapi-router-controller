@@ -1,7 +1,10 @@
 import inspect
 from copy import deepcopy
 from fastapi import APIRouter, Depends
-from fastapi_router_controller.lib.exceptions import MultipleResourceException, MultipleRouterException
+from fastapi_router_controller.lib.exceptions import (
+    MultipleResourceException,
+    MultipleRouterException,
+)
 
 OPEN_API_TAGS = []
 __app_controllers__ = []
@@ -32,19 +35,21 @@ __router_params__ = [
 
 class Controller:
     """
-        The Controller class.
+    The Controller class.
 
-        It expose some utilities and decorator functions to define a router controller class
+    It expose some utilities and decorator functions to define a router controller class
     """
-    RC_KEY = '__router__'
-    SIGNATURE_KEY = '__signature__'
-    HAS_CONTROLLER_KEY = '__has_controller__'
-    RESOURCE_CLASS_KEY = '__resource_cls__'
+
+    RC_KEY = "__router__"
+    SIGNATURE_KEY = "__signature__"
+    HAS_CONTROLLER_KEY = "__has_controller__"
+    RESOURCE_CLASS_KEY = "__resource_cls__"
 
     def __init__(self, router: APIRouter, openapi_tag: dict = None) -> None:
         """
-            :param router:          The FastApi router to link to the Class
-            :param openapi_tag:     An openapi object that will describe your routes in the openapi tamplate 
+        :param router:          The FastApi router to link to the Class
+        :param openapi_tag:     An openapi object that will describe your routes
+                                in the openapi tamplate
         """
         # Each Controller must be linked to one fastapi router
         if hasattr(router, Controller.HAS_CONTROLLER_KEY):
@@ -58,10 +63,10 @@ class Controller:
             OPEN_API_TAGS.append(openapi_tag)
 
         setattr(router, Controller.HAS_CONTROLLER_KEY, True)
-    
+
     def __get_parent_routes(self, router: APIRouter):
         """
-            Private utility to get routes from an extended class
+        Private utility to get routes from an extended class
         """
         for route in router.routes:
             options = {key: getattr(route, key) for key in __router_params__}
@@ -73,14 +78,17 @@ class Controller:
             self.router.add_api_route(route.path, route.endpoint, **options)
 
     def add_resource(self, cls):
-        '''
-            Mark a class as Controller Resource
-        '''
+        """
+        Mark a class as Controller Resource
+        """
         # check if the same controller was already used for another cls (Resource)
-        if hasattr(self, Controller.RESOURCE_CLASS_KEY) and getattr(self, Controller.RESOURCE_CLASS_KEY) != cls:
+        if (
+            hasattr(self, Controller.RESOURCE_CLASS_KEY)
+            and getattr(self, Controller.RESOURCE_CLASS_KEY) != cls
+        ):
             raise MultipleResourceException()
 
-        # check if cls (Resource) was exteded from another 
+        # check if cls (Resource) was exteded from another
         if hasattr(cls, Controller.RC_KEY):
             self.__get_parent_routes(cls.__router__)
 
@@ -92,13 +100,14 @@ class Controller:
 
     def resource(self):
         """
-            A decorator function to mark a Class as a Controller
+        A decorator function to mark a Class as a Controller
         """
         return self.add_resource
 
     def use(_):
         """
-            A decorator function to mark a Class to be automatically loaded by the Controller
+        A decorator function to mark a Class to be automatically
+        loaded by the Controller
         """
 
         def wrapper(cls):
@@ -110,7 +119,8 @@ class Controller:
     @staticmethod
     def __parse_controller_router(cls):
         """
-            Private utility to parse the router controller property and extract the correct functions handlers
+        Private utility to parse the router controller property
+        and extract the correct functions handlers
         """
         router = getattr(cls, Controller.RC_KEY)
 
@@ -124,7 +134,7 @@ class Controller:
             if dependencies:
                 for depends in dependencies[::-1]:
                     route.dependencies.insert(0, depends)
-            
+
             # get the signature of the endpoint function
             signature = inspect.signature(route.endpoint)
             # get the parameters of the endpoint function
@@ -149,7 +159,7 @@ class Controller:
     @staticmethod
     def routers():
         """
-            It returns all the Classes marked to be used by the "use" decorator
+        It returns all the Classes marked to be used by the "use" decorator
         """
         routers = []
 
@@ -161,7 +171,7 @@ class Controller:
     @property
     def route(self) -> APIRouter:
         """
-            It returns the FastAPI router.
-            Use it as if you are using the original one.
+        It returns the FastAPI router.
+        Use it as if you are using the original one.
         """
         return self.router
