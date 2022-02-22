@@ -89,8 +89,9 @@ class Controller:
             raise MultipleResourceException()
 
         # check if cls (Resource) was exteded from another
-        if hasattr(cls, Controller.RC_KEY):
-            self.__get_parent_routes(cls.__router__)
+        for base in cls.__bases__:
+            if hasattr(base, Controller.RC_KEY):
+                self.__get_parent_routes(base.__router__)
 
         setattr(cls, Controller.RC_KEY, self.router)
         setattr(self, Controller.RESOURCE_CLASS_KEY, cls)
