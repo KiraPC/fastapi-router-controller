@@ -1,3 +1,47 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "fastapi-router-controller"
+version = "0.0.0"
+description = "A FastAPI utility to allow Controller Class usage"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Pasquale Carmine Carbone", email = "pasqualecarmine.carbone@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.63.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/KiraPC/fastapi-router-controller"
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov", "requests"]
+
+[tool.setuptools.packages.find]
+exclude = ["venv", "*.egg-info", "build"]
+
 [tool.black]
 line-length = 88
-target-version = ['py36', 'py37', 'py38']
+target-version = ['py311', 'py312', 'py313', 'py314']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov fastapi_router_controller --cov-report term --cov-report html"
