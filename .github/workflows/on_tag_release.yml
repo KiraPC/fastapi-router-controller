@@ -1,36 +1,30 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Publish Release
 
-# Controls when the action will run. 
 on:
   push:
-    # Pattern matched against refs/tags
-    tags:        
+    tags:
       - '*'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   pypi-release:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.11'
       - name: Get Tag Version
         id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Create Distribution Package
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
+      - name: Set version in pyproject.toml
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: sed -i -e "s/__VERSION__/$RELEASE_VERSION/g" setup.py && python setup.py sdist
+        run: sed -i "s/^version = .*/version = \"$RELEASE_VERSION\"/" pyproject.toml
+      - name: Build distribution package
+        run: |
+          pip install build
+          python -m build
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
