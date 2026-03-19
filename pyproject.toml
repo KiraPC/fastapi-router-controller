@@ -32,7 +32,7 @@ classifiers = [
 Homepage = "https://github.com/KiraPC/fastapi-router-controller"
 
 [project.optional-dependencies]
-tests = ["pytest", "pytest-cov", "requests"]
+tests = ["pytest", "pytest-cov", "requests", "httpx"]
 
 [tool.setuptools.packages.find]
 exclude = ["venv", "*.egg-info", "build"]
